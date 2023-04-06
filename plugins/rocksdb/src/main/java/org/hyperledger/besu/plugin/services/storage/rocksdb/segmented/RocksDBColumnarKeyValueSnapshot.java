@@ -31,7 +31,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.rocksdb.OptimisticTransactionDB;
+import org.rocksdb.TransactionDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,7 @@ public class RocksDBColumnarKeyValueSnapshot implements SnappedKeyValueStorage {
   private static final Logger LOG = LoggerFactory.getLogger(RocksDBColumnarKeyValueSnapshot.class);
 
   /** The Db. */
-  final OptimisticTransactionDB db;
+  final TransactionDB db;
 
   /** The Snap tx. */
   final RocksDBSnapshotTransaction snapTx;
@@ -56,7 +56,7 @@ public class RocksDBColumnarKeyValueSnapshot implements SnappedKeyValueStorage {
    * @param metrics the metrics
    */
   RocksDBColumnarKeyValueSnapshot(
-      final OptimisticTransactionDB db,
+      final TransactionDB db,
       final RocksDbSegmentIdentifier segment,
       final RocksDBMetrics metrics) {
     this.db = db;

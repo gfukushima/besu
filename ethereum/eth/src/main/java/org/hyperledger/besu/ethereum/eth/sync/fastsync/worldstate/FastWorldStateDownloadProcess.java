@@ -189,7 +189,7 @@ public class FastWorldStateDownloadProcess implements WorldStateDownloadProcess 
               .thenFlatMapInParallel(
                   "requestLoadLocalData",
                   task -> loadLocalDataStep.loadLocalData(task, requestsToComplete),
-                  3,
+                  1,
                   bufferCapacity)
               .inBatches(hashCountPerRequest)
               .thenProcessAsync(

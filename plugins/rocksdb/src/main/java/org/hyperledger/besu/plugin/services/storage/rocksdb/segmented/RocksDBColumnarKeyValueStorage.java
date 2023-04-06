@@ -54,7 +54,6 @@ import org.rocksdb.CompressionType;
 import org.rocksdb.DBOptions;
 import org.rocksdb.Env;
 import org.rocksdb.LRUCache;
-import org.rocksdb.OptimisticTransactionDB;
 import org.rocksdb.Options;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDB;
@@ -62,6 +61,7 @@ import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 import org.rocksdb.Statistics;
 import org.rocksdb.Status;
+import org.rocksdb.TransactionDB;
 import org.rocksdb.TransactionDBOptions;
 import org.rocksdb.WriteOptions;
 import org.slf4j.Logger;
@@ -85,7 +85,7 @@ public class RocksDBColumnarKeyValueStorage
 
   private final DBOptions options;
   private final TransactionDBOptions txOptions;
-  private final OptimisticTransactionDB db;
+  private final TransactionDB db;
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final Map<String, RocksDbSegmentIdentifier> columnHandlesByName;
   private final RocksDBMetrics metrics;
@@ -188,8 +188,12 @@ public class RocksDBColumnarKeyValueStorage
       txOptions = new TransactionDBOptions();
       final List<ColumnFamilyHandle> columnHandles = new ArrayList<>(columnDescriptors.size());
       db =
-          OptimisticTransactionDB.open(
-              options, configuration.getDatabaseDir().toString(), columnDescriptors, columnHandles);
+          TransactionDB.open(
+              options,
+              new TransactionDBOptions(),
+              configuration.getDatabaseDir().toString(),
+              columnDescriptors,
+              columnHandles);
       metrics = rocksDBMetricsFactory.create(metricsSystem, configuration, db, stats);
       final Map<Bytes, String> segmentsById =
           trimmedSegments.stream()

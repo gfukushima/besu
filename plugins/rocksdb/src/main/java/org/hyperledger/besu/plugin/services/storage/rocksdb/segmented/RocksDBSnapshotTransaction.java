@@ -27,11 +27,11 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.rocksdb.ColumnFamilyHandle;
-import org.rocksdb.OptimisticTransactionDB;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 import org.rocksdb.Transaction;
+import org.rocksdb.TransactionDB;
 import org.rocksdb.WriteOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ public class RocksDBSnapshotTransaction implements KeyValueStorageTransaction, A
   private static final Logger LOG = LoggerFactory.getLogger(RocksDBSnapshotTransaction.class);
   private static final String NO_SPACE_LEFT_ON_DEVICE = "No space left on device";
   private final RocksDBMetrics metrics;
-  private final OptimisticTransactionDB db;
+  private final TransactionDB db;
   private final ColumnFamilyHandle columnFamilyHandle;
   private final Transaction snapTx;
   private final RocksDBSnapshot snapshot;
@@ -57,7 +57,7 @@ public class RocksDBSnapshotTransaction implements KeyValueStorageTransaction, A
    * @param metrics the metrics
    */
   RocksDBSnapshotTransaction(
-      final OptimisticTransactionDB db,
+      final TransactionDB db,
       final ColumnFamilyHandle columnFamilyHandle,
       final RocksDBMetrics metrics) {
     this.metrics = metrics;
@@ -71,7 +71,7 @@ public class RocksDBSnapshotTransaction implements KeyValueStorageTransaction, A
   }
 
   private RocksDBSnapshotTransaction(
-      final OptimisticTransactionDB db,
+      final TransactionDB db,
       final ColumnFamilyHandle columnFamilyHandle,
       final RocksDBMetrics metrics,
       final RocksDBSnapshot snapshot,

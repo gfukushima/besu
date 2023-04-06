@@ -37,13 +37,14 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.rocksdb.BlockBasedTableConfig;
 import org.rocksdb.LRUCache;
-import org.rocksdb.OptimisticTransactionDB;
 import org.rocksdb.Options;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 import org.rocksdb.Statistics;
 import org.rocksdb.Status;
+import org.rocksdb.TransactionDB;
+import org.rocksdb.TransactionDBOptions;
 import org.rocksdb.WriteOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,7 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
   private static final Logger LOG = LoggerFactory.getLogger(RocksDBKeyValueStorage.class);
 
   private final Options options;
-  private final OptimisticTransactionDB db;
+  private final TransactionDB db;
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final RocksDBMetrics rocksDBMetrics;
   private final WriteOptions tryDeleteOptions =
@@ -88,7 +89,9 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
               .setStatistics(stats);
       options.getEnv().setBackgroundThreads(configuration.getBackgroundThreadCount());
 
-      db = OptimisticTransactionDB.open(options, configuration.getDatabaseDir().toString());
+      db =
+          TransactionDB.open(
+              options, new TransactionDBOptions(), configuration.getDatabaseDir().toString());
       rocksDBMetrics = rocksDBMetricsFactory.create(metricsSystem, configuration, db, stats);
     } catch (final RocksDBException e) {
       throw new StorageException(e);

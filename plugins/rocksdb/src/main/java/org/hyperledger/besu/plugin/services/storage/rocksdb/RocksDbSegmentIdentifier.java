@@ -21,13 +21,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.rocksdb.ColumnFamilyDescriptor;
 import org.rocksdb.ColumnFamilyHandle;
-import org.rocksdb.OptimisticTransactionDB;
 import org.rocksdb.RocksDBException;
+import org.rocksdb.TransactionDB;
 
 /** The RocksDb segment identifier. */
 public class RocksDbSegmentIdentifier {
 
-  private final OptimisticTransactionDB db;
+  private final TransactionDB db;
   private final AtomicReference<ColumnFamilyHandle> reference;
 
   /**
@@ -37,7 +37,7 @@ public class RocksDbSegmentIdentifier {
    * @param columnFamilyHandle the column family handle
    */
   public RocksDbSegmentIdentifier(
-      final OptimisticTransactionDB db, final ColumnFamilyHandle columnFamilyHandle) {
+      final TransactionDB db, final ColumnFamilyHandle columnFamilyHandle) {
     this.db = db;
     this.reference = new AtomicReference<>(columnFamilyHandle);
   }

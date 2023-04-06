@@ -17,8 +17,8 @@ package org.hyperledger.besu.plugin.services.storage.rocksdb.segmented;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.rocksdb.OptimisticTransactionDB;
 import org.rocksdb.Snapshot;
+import org.rocksdb.TransactionDB;
 
 /**
  * Wraps and reference counts a Snapshot object from an OptimisticTransactionDB such that it can be
@@ -27,11 +27,11 @@ import org.rocksdb.Snapshot;
  */
 class RocksDBSnapshot {
 
-  private final OptimisticTransactionDB db;
+  private final TransactionDB db;
   private final Snapshot dbSnapshot;
   private final AtomicInteger usages = new AtomicInteger(0);
 
-  RocksDBSnapshot(final OptimisticTransactionDB db) {
+  RocksDBSnapshot(final TransactionDB db) {
     this.db = db;
     this.dbSnapshot = db.getSnapshot();
   }
