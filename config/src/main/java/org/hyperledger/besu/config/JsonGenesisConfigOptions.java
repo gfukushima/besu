@@ -291,6 +291,10 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   public OptionalLong getCancunTime() {
     return getOptionalLong("cancuntime");
   }
+  @Override
+  public OptionalLong getPragueTime() {
+    return getOptionalLong("praguetime");
+  }
 
   @Override
   public OptionalLong getFutureEipsTime() {
@@ -448,6 +452,7 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
     getMergeNetSplitBlockNumber().ifPresent(l -> builder.put("mergeNetSplitBlock", l));
     getShanghaiTime().ifPresent(l -> builder.put("shanghaiTime", l));
     getCancunTime().ifPresent(l -> builder.put("cancunTime", l));
+    getPragueTime().ifPresent(l -> builder.put("pragueTime", l));
     getTerminalBlockNumber().ifPresent(l -> builder.put("terminalBlockNumber", l));
     getTerminalBlockHash().ifPresent(h -> builder.put("terminalBlockHash", h.toHexString()));
     getFutureEipsTime().ifPresent(l -> builder.put("futureEipsTime", l));

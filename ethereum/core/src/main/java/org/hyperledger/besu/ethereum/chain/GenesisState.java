@@ -262,6 +262,13 @@ public final class GenesisState {
     }
     return false;
   }
+  private static boolean isPragueAtGenesis(final GenesisConfigFile genesis) {
+    final OptionalLong pragueTimestamp = genesis.getConfigOptions().getPragueTime();
+    if (pragueTimestamp.isPresent()) {
+      return genesis.getTimestamp() >= pragueTimestamp.getAsLong();
+    }
+    return false;
+  }
 
   private static boolean isExperimentalEipsTimeAtGenesis(final GenesisConfigFile genesis) {
     final OptionalLong experimentalEipsTime = genesis.getConfigOptions().getExperimentalEipsTime();
