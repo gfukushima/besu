@@ -15,8 +15,7 @@
     "terminalTotalDifficulty": 0,
     "shanghaiTime": 0,
     "pragueTime": 1697197884,
-    "ethash":{},
-    "proofInBlocks": true
+    "ethash":{}
   },
   "alloc": {
     "0x0000000000000000000000000000000000000000": {
