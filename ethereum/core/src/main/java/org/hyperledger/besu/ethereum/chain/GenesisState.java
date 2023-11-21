@@ -173,6 +173,7 @@ public final class GenesisState {
         .parentBeaconBlockRoot(
             (isCancunAtGenesis(genesis) ? parseParentBeaconBlockRoot(genesis) : null))
         .depositsRoot(isExperimentalEipsTimeAtGenesis(genesis) ? Hash.EMPTY_TRIE_HASH : null)
+        .executionWitness(null)
         .buildBlockHeader();
   }
 
@@ -262,6 +263,7 @@ public final class GenesisState {
     }
     return false;
   }
+  @SuppressWarnings("unused")
   private static boolean isPragueAtGenesis(final GenesisConfigFile genesis) {
     final OptionalLong pragueTimestamp = genesis.getConfigOptions().getPragueTime();
     if (pragueTimestamp.isPresent()) {

@@ -22,6 +22,7 @@ import org.hyperledger.besu.ethereum.core.BlockHeaderFunctions;
 import org.hyperledger.besu.ethereum.core.BlockImporter;
 import org.hyperledger.besu.ethereum.mainnet.feemarket.FeeMarket;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransactionProcessor;
+import org.hyperledger.besu.ethereum.trie.verkle.ExecutionWitness;
 import org.hyperledger.besu.evm.EVM;
 import org.hyperledger.besu.evm.gascalculator.GasCalculator;
 import org.hyperledger.besu.evm.precompile.PrecompileContractRegistry;
@@ -79,6 +80,7 @@ public class ProtocolSpec {
   private final WithdrawalsValidator withdrawalsValidator;
   private final Optional<WithdrawalsProcessor> withdrawalsProcessor;
   private final DepositsValidator depositsValidator;
+  private final ExecutionWitnessValidator executionWitnessValidator;
 
   private final boolean isPoS;
   private final boolean isReplayProtectionSupported;
@@ -110,7 +112,8 @@ public class ProtocolSpec {
    * @param powHasher the proof-of-work hasher
    * @param withdrawalsValidator the withdrawals validator to use
    * @param withdrawalsProcessor the Withdrawals processor to use
-   * @param depositsValidator the withdrawals validator to use
+   * @param depositsValidator the deposits validator to use
+   * @param executionWitnessValidator the witness validator to use
    * @param isPoS indicates whether the current spec is PoS
    * @param isReplayProtectionSupported indicates whether the current spec supports replay
    *     protection
@@ -142,6 +145,7 @@ public class ProtocolSpec {
       final WithdrawalsValidator withdrawalsValidator,
       final Optional<WithdrawalsProcessor> withdrawalsProcessor,
       final DepositsValidator depositsValidator,
+      final ExecutionWitnessValidator executionWitnessValidator,
       final boolean isPoS,
       final boolean isReplayProtectionSupported) {
     this.name = name;
@@ -170,6 +174,7 @@ public class ProtocolSpec {
     this.withdrawalsValidator = withdrawalsValidator;
     this.withdrawalsProcessor = withdrawalsProcessor;
     this.depositsValidator = depositsValidator;
+    this.executionWitnessValidator = executionWitnessValidator;
     this.isPoS = isPoS;
     this.isReplayProtectionSupported = isReplayProtectionSupported;
   }
@@ -382,6 +387,9 @@ public class ProtocolSpec {
 
   public DepositsValidator getDepositsValidator() {
     return depositsValidator;
+  }
+  public ExecutionWitnessValidator getExecutionWitnessValidator() {
+    return executionWitnessValidator;
   }
 
   /**
