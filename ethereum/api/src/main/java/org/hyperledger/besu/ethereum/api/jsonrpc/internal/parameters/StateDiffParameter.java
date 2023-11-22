@@ -1,43 +1,36 @@
 package org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.tuweni.bytes.Bytes;
 import org.hyperledger.besu.ethereum.trie.verkle.StateDiff;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class StateDiffParameter {
-     final Bytes stem;
-     final SuffixStateDiffParameter suffixDiffs;
 
-    @JsonCreator
-    public StateDiffParameter(
-            @JsonProperty("stem") final Bytes stem,
-            @JsonProperty("suffixDiffs") final SuffixStateDiffParameter suffixDiffs) {
-        this.stem = stem;
-        this.suffixDiffs = suffixDiffs;
-    }
+  final List<StemStateDiffParameter> steamStateDiff;
 
-    public static StateDiffParameter fromStateDiff(final StateDiff stateDiff) {
-        return new StateDiffParameter(
-                stateDiff.getStem(),
-                SuffixStateDiffParameter.fromSuffixStateDiff(stateDiff.getSuffixDiffs()));
-    }
+  @JsonCreator
+  public StateDiffParameter(final List<StemStateDiffParameter> steamStateDiff) {
+    this.steamStateDiff = steamStateDiff;
+  }
 
-    public static StateDiff toStateDiff(final StateDiffParameter stateDiffParameter) {
-        return new StateDiff(
-                stateDiffParameter.getStem(),
-                SuffixStateDiffParameter.toSuffixStateDiff(stateDiffParameter.getSuffixDiffs()));
-    }
+  public List<StemStateDiffParameter> getSteamStateDiff() {
+    return steamStateDiff;
+  }
 
-    @JsonGetter
-    public Bytes getStem() {
-        return stem;
-    }
+  public static StateDiff toStateDiff(final StateDiffParameter stateDiffParameter) {
+    return new StateDiff(
+        StemStateDiffParameter.toListOfStemStateDiff(stateDiffParameter.getSteamStateDiff()));
+  }
 
-    @JsonGetter
-    public SuffixStateDiffParameter getSuffixDiffs() {
-        return suffixDiffs;
-    }
+  public static StateDiffParameter fromStateDiff(final StateDiff stateDiff) {
+    return new StateDiffParameter(
+        StemStateDiffParameter.fromListOfStemStateDiff(stateDiff.steamStateDiff()));
+  }
+
+  @Override
+  public String toString() {
+    return "StateDiffParameter{" + "steamStateDiff=" + steamStateDiff + '}';
+  }
 }

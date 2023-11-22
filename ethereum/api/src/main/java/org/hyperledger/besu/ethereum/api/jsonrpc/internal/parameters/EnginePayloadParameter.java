@@ -89,7 +89,7 @@ public class EnginePayloadParameter {
       @JsonProperty("blobGasUsed") final UnsignedLongParameter blobGasUsed,
       @JsonProperty("excessBlobGas") final String excessBlobGas,
       @JsonProperty("depositReceipts") final List<DepositParameter> deposits,
-      @JsonProperty("executionWitness")final ExecutionWitnessParameter executionWitness){
+      @JsonProperty("executionWitness") final ExecutionWitnessParameter executionWitness) {
     this.blockHash = blockHash;
     this.parentHash = parentHash;
     this.feeRecipient = feeRecipient;
@@ -182,6 +182,7 @@ public class EnginePayloadParameter {
   public List<DepositParameter> getDeposits() {
     return deposits;
   }
+
   public ExecutionWitnessParameter getExecutionWitness() {
     return executionWitness;
   }

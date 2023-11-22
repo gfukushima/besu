@@ -1,22 +1,11 @@
 package org.hyperledger.besu.ethereum.trie.verkle;
 
-import org.apache.tuweni.bytes.Bytes;
+import java.util.List;
 
+public record StateDiff(List<StemStateDiff> steamStateDiff) {
 
-public class StateDiff {
-     final Bytes stem;
-     final SuffixStateDiff suffixDiffs;
-
-    public StateDiff(final Bytes stem, final SuffixStateDiff suffixDiffs) {
-        this.stem = stem;
-        this.suffixDiffs = suffixDiffs;
-    }
-
-    public Bytes getStem() {
-        return stem;
-    }
-
-    public SuffixStateDiff getSuffixDiffs() {
-        return suffixDiffs;
-    }
+  @Override
+  public String toString() {
+    return "StateDiff{" + "steamStateDiff=" + steamStateDiff + '}';
+  }
 }
