@@ -291,6 +291,7 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   public OptionalLong getCancunTime() {
     return getOptionalLong("cancuntime");
   }
+
   @Override
   public OptionalLong getPragueTime() {
     return getOptionalLong("praguetime");

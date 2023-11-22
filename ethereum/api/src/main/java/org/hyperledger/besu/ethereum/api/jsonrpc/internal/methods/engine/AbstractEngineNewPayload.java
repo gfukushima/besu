@@ -103,7 +103,7 @@ public abstract class AbstractEngineNewPayload extends ExecutionEngineJsonRpcMet
   @Override
   public JsonRpcResponse syncResponse(final JsonRpcRequestContext requestContext) {
     engineCallListener.executionEngineCalled();
-
+    // LOG.info("NewPayload param" + Arrays.toString(requestContext.getRequest().getParams()));
     final EnginePayloadParameter blockParam =
         requestContext.getRequiredParameter(0, EnginePayloadParameter.class);
 
@@ -170,11 +170,13 @@ public abstract class AbstractEngineNewPayload extends ExecutionEngineJsonRpcMet
     }
 
     final Optional<ExecutionWitness> maybeExecutionWitness =
-        Optional.ofNullable(blockParam.getExecutionWitness()).map(ExecutionWitnessParameter::toExecutionWitness);
+        Optional.ofNullable(blockParam.getExecutionWitness())
+            .map(ExecutionWitnessParameter::toExecutionWitness);
     if (!getExecutionWitnessValidator(
             protocolSchedule.get(), blockParam.getTimestamp(), blockParam.getBlockNumber())
         .validateExecutionWitness(maybeExecutionWitness)) {
-      return new JsonRpcErrorResponse(reqId, new JsonRpcError(INVALID_PARAMS, "Invalid executionWitness"));
+      return new JsonRpcErrorResponse(
+          reqId, new JsonRpcError(INVALID_PARAMS, "Invalid executionWitness"));
     }
 
     if (mergeContext.get().isSyncing()) {

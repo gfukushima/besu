@@ -232,6 +232,7 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions, Cloneable
   public OptionalLong getCancunTime() {
     return cancunTime;
   }
+
   @Override
   public OptionalLong getPragueTime() {
     return pragueTime;

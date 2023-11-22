@@ -45,28 +45,28 @@ public class BlockHeader extends SealableBlockHeader
   private final Supplier<ParsedExtraData> parsedExtraData;
 
   public BlockHeader(
-          final Hash parentHash,
-          final Hash ommersHash,
-          final Address coinbase,
-          final Hash stateRoot,
-          final Hash transactionsRoot,
-          final Hash receiptsRoot,
-          final LogsBloomFilter logsBloom,
-          final Difficulty difficulty,
-          final long number,
-          final long gasLimit,
-          final long gasUsed,
-          final long timestamp,
-          final Bytes extraData,
-          final Wei baseFee,
-          final Bytes32 mixHashOrPrevRandao,
-          final long nonce,
-          final Hash withdrawalsRoot,
-          final Long blobGasUsed,
-          final BlobGas excessBlobGas,
-          final Bytes32 parentBeaconBlockRoot,
-          final Hash depositsRoot,
-          final ExecutionWitness executionWitness,
+      final Hash parentHash,
+      final Hash ommersHash,
+      final Address coinbase,
+      final Hash stateRoot,
+      final Hash transactionsRoot,
+      final Hash receiptsRoot,
+      final LogsBloomFilter logsBloom,
+      final Difficulty difficulty,
+      final long number,
+      final long gasLimit,
+      final long gasUsed,
+      final long timestamp,
+      final Bytes extraData,
+      final Wei baseFee,
+      final Bytes32 mixHashOrPrevRandao,
+      final long nonce,
+      final Hash withdrawalsRoot,
+      final Long blobGasUsed,
+      final BlobGas excessBlobGas,
+      final Bytes32 parentBeaconBlockRoot,
+      final Hash depositsRoot,
+      final ExecutionWitness executionWitness,
       final BlockHeaderFunctions blockHeaderFunctions) {
     super(
         parentHash,
@@ -328,7 +328,7 @@ public class BlockHeader extends SealableBlockHeader
             .getDepositsRoot()
             .map(h -> Hash.fromHexString(h.toHexString()))
             .orElse(null),
-            (ExecutionWitness) pluginBlockHeader.getExecutionWitness().orElse(null),
+        (ExecutionWitness) pluginBlockHeader.getExecutionWitness().orElse(null),
         blockHeaderFunctions);
   }
 

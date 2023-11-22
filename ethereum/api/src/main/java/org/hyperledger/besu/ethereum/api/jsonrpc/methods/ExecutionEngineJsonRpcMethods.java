@@ -161,15 +161,15 @@ public class ExecutionEngineJsonRpcMethods extends ApiGroupJsonRpcMethods {
                 protocolSchedule));
       }
 
-      if (protocolSchedule.anyMatch(p -> p.spec().getName().equalsIgnoreCase("prague"))){
+      if (protocolSchedule.anyMatch(p -> p.spec().getName().equalsIgnoreCase("prague"))) {
         executionEngineApisSupported.add(
-                new EngineNewPayloadV6800(
-                        consensusEngineServer,
-                        protocolSchedule,
-                        protocolContext,
-                        mergeCoordinator.get(),
-                        ethPeers,
-                        engineQosTimer));
+            new EngineNewPayloadV6800(
+                consensusEngineServer,
+                protocolSchedule,
+                protocolContext,
+                mergeCoordinator.get(),
+                ethPeers,
+                engineQosTimer));
       }
 
       if (protocolSchedule.anyMatch(p -> p.spec().getName().equalsIgnoreCase("ExperimentalEips"))) {

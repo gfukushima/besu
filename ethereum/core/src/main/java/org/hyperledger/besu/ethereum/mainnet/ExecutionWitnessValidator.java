@@ -16,40 +16,28 @@
 
 package org.hyperledger.besu.ethereum.mainnet;
 
-import org.hyperledger.besu.datatypes.Address;
-import org.hyperledger.besu.datatypes.Hash;
-import org.hyperledger.besu.ethereum.core.Block;
-import org.hyperledger.besu.ethereum.core.Deposit;
-import org.hyperledger.besu.ethereum.core.TransactionReceipt;
-import org.hyperledger.besu.ethereum.core.encoding.DepositDecoder;
 import org.hyperledger.besu.ethereum.trie.verkle.ExecutionWitness;
-import org.hyperledger.besu.evm.log.Log;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.swing.text.html.Option;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public interface ExecutionWitnessValidator {
 
   boolean validateExecutionWitness(Optional<ExecutionWitness> executionWitness);
 
-
-
   class ProhibitedExecutionWitness implements ExecutionWitnessValidator {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProhibitedExecutionWitness.class);
-
 
     @Override
     public boolean validateExecutionWitness(final Optional<ExecutionWitness> executionWitness) {
       final boolean isValid = executionWitness.isEmpty();
       if (!isValid) {
-        LOG.warn("ExecutionWitness must be empty when ExecutionWitness are prohibited but were: {}", executionWitness);
+        LOG.warn(
+            "ExecutionWitness must be empty when ExecutionWitness are prohibited but were: {}",
+            executionWitness);
       }
       return isValid;
     }
@@ -65,10 +53,8 @@ public interface ExecutionWitnessValidator {
         LOG.warn("ExecutionWitness must not be empty when ExecutionWitness are activated");
         return false;
       }
-      //TODO implement logic to validate a ExecutionWitness?
+      // TODO implement logic to validate a ExecutionWitness?
       return true;
-
     }
-
   }
 }

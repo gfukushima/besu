@@ -52,27 +52,27 @@ public class SealableBlockHeader extends ProcessableBlockHeader {
   protected final ExecutionWitness executionWitness;
 
   protected SealableBlockHeader(
-          final Hash parentHash,
-          final Hash ommersHash,
-          final Address coinbase,
-          final Hash stateRoot,
-          final Hash transactionsRoot,
-          final Hash receiptsRoot,
-          final LogsBloomFilter logsBloom,
-          final Difficulty difficulty,
-          final long number,
-          final long gasLimit,
-          final long gasUsed,
-          final long timestamp,
-          final Bytes extraData,
-          final Wei baseFee,
-          final Bytes32 mixHashOrPrevRandao,
-          final Hash withdrawalsRoot,
-          final Long blobGasUsed,
-          final BlobGas excessBlobGas,
-          final Bytes32 parentBeaconBlockRoot,
-          final Hash depositsRoot,
-          final ExecutionWitness executionWitness) {
+      final Hash parentHash,
+      final Hash ommersHash,
+      final Address coinbase,
+      final Hash stateRoot,
+      final Hash transactionsRoot,
+      final Hash receiptsRoot,
+      final LogsBloomFilter logsBloom,
+      final Difficulty difficulty,
+      final long number,
+      final long gasLimit,
+      final long gasUsed,
+      final long timestamp,
+      final Bytes extraData,
+      final Wei baseFee,
+      final Bytes32 mixHashOrPrevRandao,
+      final Hash withdrawalsRoot,
+      final Long blobGasUsed,
+      final BlobGas excessBlobGas,
+      final Bytes32 parentBeaconBlockRoot,
+      final Hash depositsRoot,
+      final ExecutionWitness executionWitness) {
     super(
         parentHash,
         coinbase,
@@ -201,5 +201,7 @@ public class SealableBlockHeader extends ProcessableBlockHeader {
    *
    * @return the execution witness if available.
    */
-  public Optional<ExecutionWitness> getExecutionWitness() { return Optional.ofNullable(executionWitness);}
+  public Optional<ExecutionWitness> getExecutionWitness() {
+    return Optional.ofNullable(executionWitness);
+  }
 }

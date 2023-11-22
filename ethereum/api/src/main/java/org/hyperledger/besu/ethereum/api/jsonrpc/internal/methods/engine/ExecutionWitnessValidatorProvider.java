@@ -17,7 +17,6 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.engine;
 
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderBuilder;
-import org.hyperledger.besu.ethereum.mainnet.DepositsValidator;
 import org.hyperledger.besu.ethereum.mainnet.ExecutionWitnessValidator;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpec;
@@ -37,7 +36,8 @@ public class ExecutionWitnessValidatorProvider {
     return getExecutionWitnessValidator(protocolSchedule.getByBlockHeader(blockHeader));
   }
 
-  private static ExecutionWitnessValidator getExecutionWitnessValidator(final ProtocolSpec protocolSchedule) {
+  private static ExecutionWitnessValidator getExecutionWitnessValidator(
+      final ProtocolSpec protocolSchedule) {
     return Optional.ofNullable(protocolSchedule)
         .map(ProtocolSpec::getExecutionWitnessValidator)
         .orElseGet(ExecutionWitnessValidator.ProhibitedExecutionWitness::new);

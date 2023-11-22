@@ -263,6 +263,7 @@ public final class GenesisState {
     }
     return false;
   }
+
   @SuppressWarnings("unused")
   private static boolean isPragueAtGenesis(final GenesisConfigFile genesis) {
     final OptionalLong pragueTimestamp = genesis.getConfigOptions().getPragueTime();

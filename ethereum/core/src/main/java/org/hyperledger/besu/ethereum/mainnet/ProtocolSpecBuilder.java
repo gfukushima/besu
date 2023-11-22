@@ -76,7 +76,8 @@ public class ProtocolSpecBuilder {
   private WithdrawalsProcessor withdrawalsProcessor;
 
   private DepositsValidator depositsValidator = new DepositsValidator.ProhibitedDeposits();
-  private ExecutionWitnessValidator executionWitnessValidator = new ExecutionWitnessValidator.ProhibitedExecutionWitness();
+  private ExecutionWitnessValidator executionWitnessValidator =
+      new ExecutionWitnessValidator.ProhibitedExecutionWitness();
   private FeeMarket feeMarket = FeeMarket.legacy();
   private BadBlockManager badBlockManager;
   private PoWHasher powHasher = PoWHasher.ETHASH_LIGHT;
@@ -265,7 +266,9 @@ public class ProtocolSpecBuilder {
     this.depositsValidator = depositsValidator;
     return this;
   }
-  public ProtocolSpecBuilder executionWitnessValidator(final ExecutionWitnessValidator executionWitnessValidator) {
+
+  public ProtocolSpecBuilder executionWitnessValidator(
+      final ExecutionWitnessValidator executionWitnessValidator) {
     this.executionWitnessValidator = executionWitnessValidator;
     return this;
   }

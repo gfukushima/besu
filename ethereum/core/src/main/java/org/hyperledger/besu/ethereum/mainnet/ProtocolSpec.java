@@ -22,7 +22,6 @@ import org.hyperledger.besu.ethereum.core.BlockHeaderFunctions;
 import org.hyperledger.besu.ethereum.core.BlockImporter;
 import org.hyperledger.besu.ethereum.mainnet.feemarket.FeeMarket;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransactionProcessor;
-import org.hyperledger.besu.ethereum.trie.verkle.ExecutionWitness;
 import org.hyperledger.besu.evm.EVM;
 import org.hyperledger.besu.evm.gascalculator.GasCalculator;
 import org.hyperledger.besu.evm.precompile.PrecompileContractRegistry;
@@ -388,6 +387,7 @@ public class ProtocolSpec {
   public DepositsValidator getDepositsValidator() {
     return depositsValidator;
   }
+
   public ExecutionWitnessValidator getExecutionWitnessValidator() {
     return executionWitnessValidator;
   }
