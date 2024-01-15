@@ -182,6 +182,7 @@ public class ThreadBesuNodeRunner implements BesuNodeRunner {
 
     final TransactionPoolConfiguration txPoolConfig =
         ImmutableTransactionPoolConfiguration.builder()
+            .from(node.getTransactionPoolConfiguration())
             .strictTransactionReplayProtectionEnabled(node.isStrictTxReplayProtectionEnabled())
             .build();
 
@@ -225,6 +226,7 @@ public class ThreadBesuNodeRunner implements BesuNodeRunner {
 
     final RunnerBuilder runnerBuilder = new RunnerBuilder();
     runnerBuilder.permissioningConfiguration(node.getPermissioningConfiguration());
+    runnerBuilder.apiConfiguration(node.getApiConfiguration());
 
     runnerBuilder
         .vertx(Vertx.vertx())

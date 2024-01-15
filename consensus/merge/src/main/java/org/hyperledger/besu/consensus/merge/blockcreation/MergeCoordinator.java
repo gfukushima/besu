@@ -212,6 +212,11 @@ public class MergeCoordinator implements MergeMiningCoordinator, BadChainListene
   }
 
   @Override
+  public Wei getMinPriorityFeePerGas() {
+    return miningParameters.getMinPriorityFeePerGas();
+  }
+
+  @Override
   public void setExtraData(final Bytes extraData) {
     this.miningParameters.setExtraData(extraData);
   }
@@ -491,7 +496,7 @@ public class MergeCoordinator implements MergeMiningCoordinator, BadChainListene
 
     if (maybeHeadHeader.isPresent()) {
       LOG.atDebug()
-          .setMessage("BlockHeader {} is already present")
+          .setMessage("BlockHeader {} is already present in blockchain")
           .addArgument(maybeHeadHeader.get()::toLogString)
           .log();
     } else {

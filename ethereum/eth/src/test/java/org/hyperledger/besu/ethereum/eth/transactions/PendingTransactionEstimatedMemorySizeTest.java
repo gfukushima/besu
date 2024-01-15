@@ -58,7 +58,7 @@ public class PendingTransactionEstimatedMemorySizeTest extends BaseTransactionPo
   private static final Set<Class<?>> SHARED_CLASSES =
       Set.of(SignatureAlgorithm.class, TransactionType.class);
   private static final Set<String> COMMON_CONSTANT_FIELD_PATHS =
-      Set.of(".value.ctor", ".hashNoSignature");
+      Set.of(".value.ctor", ".hashNoSignature", ".signature.encoded.delegate");
   private static final Set<String> EIP1559_EIP4844_CONSTANT_FIELD_PATHS =
       Sets.union(COMMON_CONSTANT_FIELD_PATHS, Set.of(".gasPrice"));
   private static final Set<String> FRONTIER_ACCESS_LIST_CONSTANT_FIELD_PATHS =
@@ -256,8 +256,12 @@ public class PendingTransactionEstimatedMemorySizeTest extends BaseTransactionPo
     final ClassLayout cl = ClassLayout.parseInstance(bwc);
     System.out.println(cl.toPrintable());
     System.out.println("BlobsWithCommitments size: " + cl.instanceSize());
+    final ClassLayout rl = ClassLayout.parseInstance(bwc.getBlobs());
+    System.out.println(rl.toPrintable());
+    System.out.println("BlobQuad size:" + rl.instanceSize());
 
-    assertThat(cl.instanceSize()).isEqualTo(PendingTransaction.BLOBS_WITH_COMMITMENTS_SIZE);
+    assertThat(cl.instanceSize() + rl.instanceSize())
+        .isEqualTo(PendingTransaction.BLOBS_WITH_COMMITMENTS_SIZE);
   }
 
   @Test
