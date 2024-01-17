@@ -25,14 +25,17 @@ import org.hyperledger.besu.ethereum.storage.keyvalue.KeyValueStoragePrefixedKey
 import org.hyperledger.besu.ethereum.storage.keyvalue.KeyValueStorageProvider;
 import org.hyperledger.besu.ethereum.storage.keyvalue.VariablesKeyValueStorage;
 import org.hyperledger.besu.ethereum.storage.keyvalue.WorldStatePreimageKeyValueStorage;
-import org.hyperledger.besu.ethereum.trie.bonsai.BonsaiWorldStateProvider;
-import org.hyperledger.besu.ethereum.trie.bonsai.cache.CachedMerkleTrieLoader;
-import org.hyperledger.besu.ethereum.trie.bonsai.storage.BonsaiWorldStateKeyValueStorage;
-import org.hyperledger.besu.ethereum.trie.bonsai.trielog.TrieLogPruner;
+import org.hyperledger.besu.ethereum.trie.diffbased.bonsai.BonsaiWorldStateProvider;
+import org.hyperledger.besu.ethereum.trie.diffbased.bonsai.cache.BonsaiCachedMerkleTrieLoader;
+import org.hyperledger.besu.ethereum.trie.diffbased.bonsai.storage.BonsaiWorldStateKeyValueStorage;
+import org.hyperledger.besu.ethereum.trie.diffbased.common.trielog.TrieLogPruner;
+import org.hyperledger.besu.ethereum.trie.diffbased.verkle.VerkleWorldStateProvider;
+import org.hyperledger.besu.ethereum.trie.diffbased.verkle.storage.VerkleWorldStateKeyValueStorage;
 import org.hyperledger.besu.ethereum.trie.forest.ForestWorldStateArchive;
 import org.hyperledger.besu.ethereum.trie.forest.storage.ForestWorldStateKeyValueStorage;
 import org.hyperledger.besu.ethereum.trie.forest.worldview.ForestMutableWorldState;
 import org.hyperledger.besu.ethereum.worldstate.DataStorageFormat;
+import org.hyperledger.besu.ethereum.worldstate.WorldStateStorageCoordinator;
 import org.hyperledger.besu.evm.internal.EvmConfiguration;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.services.kvstore.InMemoryKeyValueStorage;
@@ -80,7 +83,8 @@ public class InMemoryKeyValueStorageProvider extends KeyValueStorageProvider {
 
   public static ForestWorldStateArchive createInMemoryWorldStateArchive() {
     return new ForestWorldStateArchive(
-        new ForestWorldStateKeyValueStorage(new InMemoryKeyValueStorage()),
+        new WorldStateStorageCoordinator(
+            new ForestWorldStateKeyValueStorage(new InMemoryKeyValueStorage())),
         new WorldStatePreimageKeyValueStorage(new InMemoryKeyValueStorage()),
         EvmConfiguration.DEFAULT);
   }
@@ -94,14 +98,34 @@ public class InMemoryKeyValueStorageProvider extends KeyValueStorageProvider {
       final Blockchain blockchain, final EvmConfiguration evmConfiguration) {
     final InMemoryKeyValueStorageProvider inMemoryKeyValueStorageProvider =
         new InMemoryKeyValueStorageProvider();
-    final CachedMerkleTrieLoader cachedMerkleTrieLoader =
-        new CachedMerkleTrieLoader(new NoOpMetricsSystem());
+    final BonsaiCachedMerkleTrieLoader cachedMerkleTrieLoader =
+        new BonsaiCachedMerkleTrieLoader(new NoOpMetricsSystem());
     return new BonsaiWorldStateProvider(
         (BonsaiWorldStateKeyValueStorage)
             inMemoryKeyValueStorageProvider.createWorldStateStorage(DataStorageFormat.BONSAI),
         blockchain,
         Optional.empty(),
         cachedMerkleTrieLoader,
+        new NoOpMetricsSystem(),
+        null,
+        evmConfiguration,
+        TrieLogPruner.noOpTrieLogPruner());
+  }
+
+  public static VerkleWorldStateProvider createVerkleInMemoryWorldStateArchive(
+      final Blockchain blockchain) {
+    return createVerkleInMemoryWorldStateArchive(blockchain, EvmConfiguration.DEFAULT);
+  }
+
+  public static VerkleWorldStateProvider createVerkleInMemoryWorldStateArchive(
+      final Blockchain blockchain, final EvmConfiguration evmConfiguration) {
+    final InMemoryKeyValueStorageProvider inMemoryKeyValueStorageProvider =
+        new InMemoryKeyValueStorageProvider();
+    return new VerkleWorldStateProvider(
+        (VerkleWorldStateKeyValueStorage)
+            inMemoryKeyValueStorageProvider.createWorldStateStorage(DataStorageFormat.VERKLE),
+        blockchain,
+        Optional.empty(),
         new NoOpMetricsSystem(),
         null,
         evmConfiguration,

@@ -80,10 +80,12 @@ import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
 import org.hyperledger.besu.ethereum.p2p.config.SubProtocolConfiguration;
 import org.hyperledger.besu.ethereum.storage.StorageProvider;
 import org.hyperledger.besu.ethereum.storage.keyvalue.KeyValueSegmentIdentifier;
-import org.hyperledger.besu.ethereum.trie.bonsai.BonsaiWorldStateProvider;
-import org.hyperledger.besu.ethereum.trie.bonsai.cache.CachedMerkleTrieLoader;
-import org.hyperledger.besu.ethereum.trie.bonsai.storage.BonsaiWorldStateKeyValueStorage;
-import org.hyperledger.besu.ethereum.trie.bonsai.trielog.TrieLogPruner;
+import org.hyperledger.besu.ethereum.trie.diffbased.bonsai.BonsaiWorldStateProvider;
+import org.hyperledger.besu.ethereum.trie.diffbased.bonsai.cache.BonsaiCachedMerkleTrieLoader;
+import org.hyperledger.besu.ethereum.trie.diffbased.bonsai.storage.BonsaiWorldStateKeyValueStorage;
+import org.hyperledger.besu.ethereum.trie.diffbased.common.trielog.TrieLogPruner;
+import org.hyperledger.besu.ethereum.trie.diffbased.verkle.VerkleWorldStateProvider;
+import org.hyperledger.besu.ethereum.trie.diffbased.verkle.storage.VerkleWorldStateKeyValueStorage;
 import org.hyperledger.besu.ethereum.trie.forest.ForestWorldStateArchive;
 import org.hyperledger.besu.ethereum.trie.forest.pruner.MarkSweepPruner;
 import org.hyperledger.besu.ethereum.trie.forest.pruner.Pruner;
@@ -92,7 +94,7 @@ import org.hyperledger.besu.ethereum.worldstate.DataStorageConfiguration;
 import org.hyperledger.besu.ethereum.worldstate.DataStorageFormat;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.ethereum.worldstate.WorldStatePreimageStorage;
-import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
+import org.hyperledger.besu.ethereum.worldstate.WorldStateStorageCoordinator;
 import org.hyperledger.besu.evm.internal.EvmConfiguration;
 import org.hyperledger.besu.metrics.ObservableMetricsSystem;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
@@ -591,12 +593,15 @@ public abstract class BesuControllerBuilder implements MiningParameterOverrides 
     prepForBuild();
 
     final ProtocolSchedule protocolSchedule = createProtocolSchedule();
-    final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
+    final GenesisState genesisState =
+            GenesisState.fromConfig(
+                    dataStorageConfiguration.getDataStorageFormat(), genesisConfig, protocolSchedule);
 
     final VariablesStorage variablesStorage = storageProvider.createVariablesStorage();
 
-    final WorldStateStorage worldStateStorage =
-        storageProvider.createWorldStateStorage(dataStorageConfiguration.getDataStorageFormat());
+    final WorldStateStorageCoordinator worldStateStorageCoordinator =
+        storageProvider.createWorldStateStorageCoordinator(
+            dataStorageConfiguration.getDataStorageFormat());
 
     final BlockchainStorage blockchainStorage =
         storageProvider.createBlockchainStorage(protocolSchedule, variablesStorage);
@@ -610,13 +615,13 @@ public abstract class BesuControllerBuilder implements MiningParameterOverrides 
             dataDirectory.toString(),
             numberOfBlocksToCache);
 
-    final CachedMerkleTrieLoader cachedMerkleTrieLoader =
+    final BonsaiCachedMerkleTrieLoader cachedMerkleTrieLoader =
         besuComponent
             .map(BesuComponent::getCachedMerkleTrieLoader)
-            .orElseGet(() -> new CachedMerkleTrieLoader(metricsSystem));
+            .orElseGet(() -> new BonsaiCachedMerkleTrieLoader(metricsSystem));
 
     final WorldStateArchive worldStateArchive =
-        createWorldStateArchive(worldStateStorage, blockchain, cachedMerkleTrieLoader);
+        createWorldStateArchive(worldStateStorageCoordinator, blockchain, cachedMerkleTrieLoader);
 
     if (blockchain.getChainHeadBlockNumber() < 1) {
       genesisState.writeStateTo(worldStateArchive.getMutable());
@@ -751,7 +756,7 @@ public abstract class BesuControllerBuilder implements MiningParameterOverrides 
     final Synchronizer synchronizer =
         createSynchronizer(
             protocolSchedule,
-            worldStateStorage,
+            worldStateStorageCoordinator,
             protocolContext,
             maybePruner,
             ethContext,
@@ -811,7 +816,7 @@ public abstract class BesuControllerBuilder implements MiningParameterOverrides 
    * Create synchronizer synchronizer.
    *
    * @param protocolSchedule the protocol schedule
-   * @param worldStateStorage the world state storage
+   * @param worldStateStorageCoordinator the world state storage
    * @param protocolContext the protocol context
    * @param maybePruner the maybe pruner
    * @param ethContext the eth context
@@ -822,7 +827,7 @@ public abstract class BesuControllerBuilder implements MiningParameterOverrides 
    */
   protected Synchronizer createSynchronizer(
       final ProtocolSchedule protocolSchedule,
-      final WorldStateStorage worldStateStorage,
+      final WorldStateStorageCoordinator worldStateStorageCoordinator,
       final ProtocolContext protocolContext,
       final Optional<Pruner> maybePruner,
       final EthContext ethContext,
@@ -834,7 +839,7 @@ public abstract class BesuControllerBuilder implements MiningParameterOverrides 
         syncConfig,
         protocolSchedule,
         protocolContext,
-        worldStateStorage,
+        worldStateStorageCoordinator,
         ethProtocolManager.getBlockBroadcaster(),
         maybePruner,
         ethContext,
@@ -1063,18 +1068,20 @@ public abstract class BesuControllerBuilder implements MiningParameterOverrides 
   }
 
   WorldStateArchive createWorldStateArchive(
-      final WorldStateStorage worldStateStorage,
+      final WorldStateStorageCoordinator worldStateStorageCoordinator,
       final Blockchain blockchain,
-      final CachedMerkleTrieLoader cachedMerkleTrieLoader) {
+      final BonsaiCachedMerkleTrieLoader cachedMerkleTrieLoader) {
     return switch (dataStorageConfiguration.getDataStorageFormat()) {
       case BONSAI -> {
         final GenesisConfigOptions genesisConfigOptions = configOptionsSupplier.get();
         final boolean isProofOfStake =
             genesisConfigOptions.getTerminalTotalDifficulty().isPresent();
+        final BonsaiWorldStateKeyValueStorage worldStateKeyValueStorage =
+            worldStateStorageCoordinator.getStrategy(BonsaiWorldStateKeyValueStorage.class);
         final TrieLogPruner trieLogPruner =
             dataStorageConfiguration.getUnstable().getBonsaiTrieLogPruningEnabled()
                 ? new TrieLogPruner(
-                    (BonsaiWorldStateKeyValueStorage) worldStateStorage,
+                    worldStateKeyValueStorage,
                     blockchain,
                     dataStorageConfiguration.getUnstable().getBonsaiTrieLogRetentionThreshold(),
                     dataStorageConfiguration.getUnstable().getBonsaiTrieLogPruningLimit(),
@@ -1082,7 +1089,7 @@ public abstract class BesuControllerBuilder implements MiningParameterOverrides 
                 : TrieLogPruner.noOpTrieLogPruner();
         trieLogPruner.initialize();
         yield new BonsaiWorldStateProvider(
-            (BonsaiWorldStateKeyValueStorage) worldStateStorage,
+            worldStateKeyValueStorage,
             blockchain,
             Optional.of(dataStorageConfiguration.getBonsaiMaxLayersToLoad()),
             cachedMerkleTrieLoader,
@@ -1091,11 +1098,39 @@ public abstract class BesuControllerBuilder implements MiningParameterOverrides 
             evmConfiguration,
             trieLogPruner);
       }
+      case VERKLE -> {
+        final GenesisConfigOptions genesisConfigOptions = configOptionsSupplier.get();
+        final boolean isProofOfStake =
+            genesisConfigOptions.getTerminalTotalDifficulty().isPresent();
+        final VerkleWorldStateKeyValueStorage worldStateKeyValueStorage =
+            worldStateStorageCoordinator.getStrategy(VerkleWorldStateKeyValueStorage.class);
+        final TrieLogPruner trieLogPruner =
+            dataStorageConfiguration.getUnstable().getBonsaiTrieLogPruningEnabled()
+                ? new TrieLogPruner(
+                    worldStateKeyValueStorage,
+                    blockchain,
+                    dataStorageConfiguration.getUnstable().getBonsaiTrieLogRetentionThreshold(),
+                    dataStorageConfiguration.getUnstable().getBonsaiTrieLogPruningLimit(),
+                    isProofOfStake)
+                : TrieLogPruner.noOpTrieLogPruner();
+        trieLogPruner.initialize();
+        yield new VerkleWorldStateProvider(
+            worldStateKeyValueStorage,
+            blockchain,
+            Optional.of(dataStorageConfiguration.getBonsaiMaxLayersToLoad()),
+            metricsSystem,
+            besuComponent.map(BesuComponent::getBesuPluginContext).orElse(null),
+            evmConfiguration,
+            trieLogPruner);
+      }
       case FOREST -> {
         final WorldStatePreimageStorage preimageStorage =
             storageProvider.createWorldStatePreimageStorage();
-        yield new ForestWorldStateArchive(worldStateStorage, preimageStorage, evmConfiguration);
+        yield new ForestWorldStateArchive(
+            worldStateStorageCoordinator, preimageStorage, evmConfiguration);
       }
+      default -> throw new IllegalStateException(
+          "Unexpected value: " + dataStorageConfiguration.getDataStorageFormat());
     };
   }
 
