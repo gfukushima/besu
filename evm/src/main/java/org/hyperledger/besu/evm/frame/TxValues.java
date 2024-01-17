@@ -14,6 +14,7 @@
  */
 package org.hyperledger.besu.evm.frame;
 
+import org.hyperledger.besu.collections.undo.UndoMap;
 import org.hyperledger.besu.collections.undo.UndoSet;
 import org.hyperledger.besu.collections.undo.UndoTable;
 import org.hyperledger.besu.datatypes.Address;
@@ -47,7 +48,11 @@ public record TxValues(
     Optional<List<VersionedHash>> versionedHashes,
     UndoTable<Address, Bytes32, Bytes32> transientStorage,
     UndoSet<Address> creates,
-    UndoSet<Address> selfDestructs) {
+    UndoSet<Address> selfDestructs,
+    UndoMap<Address,Integer> accessedSubtrees,
+    UndoTable<Address,Integer,Integer> accessedLeaves,
+    UndoMap<Address,Integer> editedSubtrees,
+    UndoTable<Address,Integer,Integer> editedLeaves) {
 
   /**
    * For all data stored in this record, undo the changes since the mark.
