@@ -18,6 +18,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Collections.emptySet;
 
 import org.hyperledger.besu.collections.trie.BytesTrieSet;
+import org.hyperledger.besu.collections.undo.UndoMap;
 import org.hyperledger.besu.collections.undo.UndoSet;
 import org.hyperledger.besu.collections.undo.UndoTable;
 import org.hyperledger.besu.datatypes.Address;
@@ -106,11 +107,11 @@ public class MessageFrame {
    *  ---------------------     ---------------------     ---------------------
    *            |                         |
    *            |                         |
-   *            |                         |                 ---------------------
-   *            |                         |                 |                   |
-   *            |                         |------------&gt; |      REVERTED     |
-   *            |                         |                 |                   |
-   *            |                         |                 ---------------------
+   *            |                         |               ---------------------
+   *            |                         |               |                   |
+   *            |                         |-------------&gt; |      REVERTED     |
+   *            |                         |               |                   |
+   *            |                         |               ---------------------
    *            |                         |
    *            |                         v
    *            |               ---------------------     ---------------------
@@ -1374,6 +1375,21 @@ public class MessageFrame {
     maybeUpdatedStorage = Optional.empty();
   }
 
+  public boolean accessSubTree(final Address address,final Integer subKey){
+    return txValues.accessedSubtrees().putIfAbsent(address,subKey) != null;
+  }
+
+  public boolean accessLeafKey(final Address address,final Integer subKey, Integer leafKey){
+    return txValues.accessedLeaves().put(address,subKey,leafKey) != null;
+  }
+  public boolean editSubTree(final Address address,final Integer subKey){
+    return txValues.editedSubtrees().putIfAbsent(address,subKey) != null;
+  }
+
+  public boolean editLeafKey(final Address address,final Integer subKey, Integer leafKey){
+    return txValues.editedLeaves().put(address,subKey,leafKey) != null;
+  }
+
   /** The MessageFrame Builder. */
   public static class Builder {
 
@@ -1729,7 +1745,11 @@ public class MessageFrame {
                 versionedHashes,
                 UndoTable.of(HashBasedTable.create()),
                 UndoSet.of(new BytesTrieSet<>(Address.SIZE)),
-                UndoSet.of(new BytesTrieSet<>(Address.SIZE)));
+                UndoSet.of(new BytesTrieSet<>(Address.SIZE)),
+                    new UndoMap<>(new HashMap<>()),
+                    UndoTable.of(HashBasedTable.create()),
+                    new UndoMap<>(new HashMap<>()),
+                    UndoTable.of(HashBasedTable.create()));
         updater = worldUpdater;
         newStatic = isStatic;
       } else {
