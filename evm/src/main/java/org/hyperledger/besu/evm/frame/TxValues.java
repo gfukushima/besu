@@ -49,10 +49,10 @@ public record TxValues(
     UndoTable<Address, Bytes32, Bytes32> transientStorage,
     UndoSet<Address> creates,
     UndoSet<Address> selfDestructs,
-    UndoMap<Address,Integer> accessedSubtrees,
-    UndoTable<Address,Integer,Integer> accessedLeaves,
-    UndoMap<Address,Integer> editedSubtrees,
-    UndoTable<Address,Integer,Integer> editedLeaves) {
+    UndoMap<Address, Integer> accessedSubtrees,
+    UndoTable<Address, Integer, Integer> accessedLeaves,
+    UndoMap<Address, Integer> editedSubtrees,
+    UndoTable<Address, Integer, Integer> editedLeaves) {
 
   /**
    * For all data stored in this record, undo the changes since the mark.

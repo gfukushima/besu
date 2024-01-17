@@ -59,6 +59,7 @@ public interface MainnetPrecompiledContractRegistries {
     populateForCancun(registry, precompiledContractConfiguration.getGasCalculator());
     return registry;
   }
+
   static PrecompileContractRegistry prague(
       final PrecompiledContractConfiguration precompiledContractConfiguration) {
     final PrecompileContractRegistry registry = new PrecompileContractRegistry();

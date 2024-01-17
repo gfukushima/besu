@@ -290,7 +290,7 @@ public class BonsaiWorldState extends DiffBasedWorldState {
               (location, key) -> getStorageTrieNode(addressHash, location, key),
               oldAccount.getStorageRoot());
       try {
-        final StorageConsumingMap<StorageSlotKey, BonsaiValue<UInt256>> storageToDelete =
+        final StorageConsumingMap<StorageSlotKey, DiffBasedValue<UInt256>> storageToDelete =
             worldStateUpdater.getStorageToUpdate().get(address);
         Map<Bytes32, Bytes> entriesToDelete = storageTrie.entriesFrom(Bytes32.ZERO, 256);
         while (!entriesToDelete.isEmpty()) {
@@ -305,7 +305,7 @@ public class BonsaiWorldState extends DiffBasedWorldState {
                             address.addressHash(), storageSlotKey.getSlotHash()));
                 storageToDelete
                     .computeIfAbsent(
-                        storageSlotKey, key -> new BonsaiValue<>(slotValue, null, true))
+                        storageSlotKey, key -> new DiffBasedValue<>(slotValue, null, true))
                     .setPrior(slotValue);
               });
           entriesToDelete.keySet().forEach(storageTrie::remove);

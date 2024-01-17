@@ -14,16 +14,14 @@
  */
 package org.hyperledger.besu.evm.gascalculator;
 
-public class PragueGasCalculator extends CancunGasCalculator{
-    public PragueGasCalculator() {
-        super();
-    }
+@SuppressWarnings("unused")
+public class PragueGasCalculator extends CancunGasCalculator {
+  public PragueGasCalculator() {
+    super();
+  }
 
-    private static final long WITNESS_BRANCH_COST = 1900L;
-    private static final long WITNESS_CHUNK_COST = 200L;
-    private static final long SUBTREE_EDIT_COST = 3000L;
-    private static final long CHUNK_EDIT_COST = 500L;
-
-
-
+  private static final long WITNESS_BRANCH_COST = 1900L;
+  private static final long WITNESS_CHUNK_COST = 200L;
+  private static final long SUBTREE_EDIT_COST = 3000L;
+  private static final long CHUNK_EDIT_COST = 500L;
 }

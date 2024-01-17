@@ -159,7 +159,7 @@ public interface MainnetPrecompiledContracts {
    * @param gasCalculator the gas calculator
    */
   static void populateForPrague(
-          final PrecompileContractRegistry registry, final GasCalculator gasCalculator) {
+      final PrecompileContractRegistry registry, final GasCalculator gasCalculator) {
     populateForCancun(registry, gasCalculator);
   }
 

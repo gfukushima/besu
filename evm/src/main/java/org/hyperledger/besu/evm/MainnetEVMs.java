@@ -945,7 +945,7 @@ public class MainnetEVMs {
       final BigInteger chainID) {
     registerCancunOperations(registry, gasCalculator, chainID);
 
-    //register any new or changed operations for Prague
+    // register any new or changed operations for Prague
   }
 
   /**

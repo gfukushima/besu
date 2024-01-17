@@ -147,7 +147,8 @@ public class BesuControllerBuilderTest {
     lenient()
         .when(worldStatePreimageStorage.updater())
         .thenReturn(mock(WorldStatePreimageStorage.Updater.class));
-    lenient().when(worldStateKeyValueStorage.updater())
+    lenient()
+        .when(worldStateKeyValueStorage.updater())
         .thenReturn(mock(ForestWorldStateKeyValueStorage.Updater.class));
     besuControllerBuilder = spy(visitWithMockConfigs(new MainnetBesuControllerBuilder()));
   }

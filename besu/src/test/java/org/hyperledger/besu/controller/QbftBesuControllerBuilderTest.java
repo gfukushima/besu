@@ -103,7 +103,6 @@ public class QbftBesuControllerBuilderTest {
     final WorldStateStorageCoordinator worldStateStorageCoordinator =
         new WorldStateStorageCoordinator(worldStateKeyValueStorage);
 
-
     lenient().when(genesisConfigFile.getParentHash()).thenReturn(Hash.ZERO.toHexString());
     lenient().when(genesisConfigFile.getDifficulty()).thenReturn(Bytes.of(0).toHexString());
     when(genesisConfigFile.getExtraData()).thenReturn(Bytes.EMPTY.toHexString());
@@ -123,7 +122,8 @@ public class QbftBesuControllerBuilderTest {
         .when(storageProvider.createWorldStateStorageCoordinator(DataStorageFormat.FOREST))
         .thenReturn(worldStateStorageCoordinator);
     lenient().when(worldStateKeyValueStorage.isWorldStateAvailable(any())).thenReturn(true);
-    lenient().when(worldStateStorageCoordinator.updater())
+    lenient()
+        .when(worldStateStorageCoordinator.updater())
         .thenReturn(mock(ForestWorldStateKeyValueStorage.Updater.class));
     lenient()
         .when(worldStatePreimageStorage.updater())

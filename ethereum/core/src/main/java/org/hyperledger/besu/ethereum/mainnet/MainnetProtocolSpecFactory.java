@@ -170,12 +170,12 @@ public class MainnetProtocolSpecFactory {
 
   public ProtocolSpecBuilder pragueDefinition(final GenesisConfigOptions genesisConfigOptions) {
     return MainnetProtocolSpecs.pragueDefinition(
-            chainId,
-            contractSizeLimit,
-            evmStackSize,
-            isRevertReasonEnabled,
-            genesisConfigOptions,
-            evmConfiguration);
+        chainId,
+        contractSizeLimit,
+        evmStackSize,
+        isRevertReasonEnabled,
+        genesisConfigOptions,
+        evmConfiguration);
   }
 
   /**

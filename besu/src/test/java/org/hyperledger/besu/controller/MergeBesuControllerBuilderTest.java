@@ -113,10 +113,10 @@ public class MergeBesuControllerBuilderTest {
 
   @BeforeEach
   public void setup() {
-      final ForestWorldStateKeyValueStorage worldStateKeyValueStorage =
-              mock(ForestWorldStateKeyValueStorage.class);
-      final WorldStateStorageCoordinator worldStateStorageCoordinator =
-              new WorldStateStorageCoordinator(worldStateKeyValueStorage);
+    final ForestWorldStateKeyValueStorage worldStateKeyValueStorage =
+        mock(ForestWorldStateKeyValueStorage.class);
+    final WorldStateStorageCoordinator worldStateStorageCoordinator =
+        new WorldStateStorageCoordinator(worldStateKeyValueStorage);
 
     lenient().when(genesisConfigFile.getParentHash()).thenReturn(Hash.ZERO.toHexString());
     lenient().when(genesisConfigFile.getDifficulty()).thenReturn(Bytes.of(0).toHexString());
@@ -160,7 +160,8 @@ public class MergeBesuControllerBuilderTest {
     lenient()
         .when(worldStatePreimageStorage.updater())
         .thenReturn(mock(WorldStatePreimageStorage.Updater.class));
-    lenient().when(worldStateKeyValueStorage.updater())
+    lenient()
+        .when(worldStateKeyValueStorage.updater())
         .thenReturn(mock(ForestWorldStateKeyValueStorage.Updater.class));
     lenient().when(miningParameters.getTargetGasLimit()).thenReturn(OptionalLong.empty());
 

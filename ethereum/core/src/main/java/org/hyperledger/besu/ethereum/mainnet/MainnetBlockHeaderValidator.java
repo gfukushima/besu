@@ -39,7 +39,6 @@ import java.util.Optional;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.tuweni.bytes.Bytes;
-import org.hyperledger.besu.evm.gascalculator.PragueGasCalculator;
 
 public final class MainnetBlockHeaderValidator {
 
@@ -204,7 +203,7 @@ public final class MainnetBlockHeaderValidator {
   }
 
   public static BlockHeaderValidator.Builder pragueBlockHeaderValidator(final FeeMarket feeMarket) {
-    //TODO VERKLE - add ExecutionWitnessValidator
+    // TODO VERKLE - add ExecutionWitnessValidator
     return mergeBlockHeaderValidator(feeMarket);
   }
 }
