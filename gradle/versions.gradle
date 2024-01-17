@@ -190,7 +190,7 @@ dependencyManagement {
           entry 'ipa-multipoint'
       }
 
-      dependency 'org.hyperledger.besu:besu-verkle-trie:0.0.1-SNAPSHOT-KT5'
+      dependency 'org.hyperledger.besu:besu-verkle-trie:0.0.1-SNAPSHOT'
 
 
     dependency 'org.java-websocket:Java-WebSocket:1.5.5'
