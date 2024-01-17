@@ -51,6 +51,7 @@ import org.hyperledger.besu.evm.gascalculator.HomesteadGasCalculator;
 import org.hyperledger.besu.evm.gascalculator.IstanbulGasCalculator;
 import org.hyperledger.besu.evm.gascalculator.LondonGasCalculator;
 import org.hyperledger.besu.evm.gascalculator.PetersburgGasCalculator;
+import org.hyperledger.besu.evm.gascalculator.PragueGasCalculator;
 import org.hyperledger.besu.evm.gascalculator.ShanghaiGasCalculator;
 import org.hyperledger.besu.evm.gascalculator.SpuriousDragonGasCalculator;
 import org.hyperledger.besu.evm.gascalculator.TangerineWhistleGasCalculator;
@@ -702,6 +703,77 @@ public abstract class MainnetProtocolSpecs {
         .precompileContractRegistryBuilder(MainnetPrecompiledContractRegistries::cancun)
         .blockHeaderValidatorBuilder(MainnetBlockHeaderValidator::cancunBlockHeaderValidator)
         .name("Cancun");
+  }
+
+  static ProtocolSpecBuilder pragueDefinition(
+          final Optional<BigInteger> chainId,
+          final OptionalInt configContractSizeLimit,
+          final OptionalInt configStackSizeLimit,
+          final boolean enableRevertReason,
+          final GenesisConfigOptions genesisConfigOptions,
+          final EvmConfiguration evmConfiguration) {
+
+    final int stackSizeLimit = configStackSizeLimit.orElse(MessageFrame.DEFAULT_MAX_STACK_SIZE);
+    final long londonForkBlockNumber = genesisConfigOptions.getLondonBlockNumber().orElse(0L);
+    final BaseFeeMarket pragueFeeMarket =
+            genesisConfigOptions.isZeroBaseFee()
+                    ? FeeMarket.zeroBaseFee(londonForkBlockNumber)
+                    : FeeMarket.prague(londonForkBlockNumber, genesisConfigOptions.getBaseFeePerGas());
+
+    return cancunDefinition(
+            chainId,
+            configContractSizeLimit,
+            configStackSizeLimit,
+            enableRevertReason,
+            genesisConfigOptions,
+            evmConfiguration)
+            .feeMarket(pragueFeeMarket)
+            // gas calculator for EIP-6800/EIP-4762
+            .gasCalculator(PragueGasCalculator::new)
+            .gasLimitCalculatorBuilder(
+                    feeMarket ->
+                            new PragueTargetingGasLimitCalculator(
+                                    londonForkBlockNumber, (BaseFeeMarket) feeMarket))
+            // EVM changes to support EOF EIPs (3670, 4200, 4750, 5450)
+            .evmBuilder(
+                    (gasCalculator, jdCacheConfig) ->
+                            MainnetEVMs.prague(
+                                    gasCalculator, chainId.orElse(BigInteger.ZERO), evmConfiguration))
+            // use Cancun fee market
+            .transactionProcessorBuilder(
+                    (gasCalculator,
+                     feeMarket,
+                     transactionValidator,
+                     contractCreationProcessor,
+                     messageCallProcessor) ->
+                            new MainnetTransactionProcessor(
+                                    gasCalculator,
+                                    transactionValidator,
+                                    contractCreationProcessor,
+                                    messageCallProcessor,
+                                    true,
+                                    true,
+                                    stackSizeLimit,
+                                    feeMarket,
+                                    CoinbaseFeePriceCalculator.eip1559()))
+            // change to check for max blob gas per block for EIP-4844
+            .transactionValidatorFactoryBuilder(
+                    (gasCalculator, gasLimitCalculator, feeMarket) ->
+                            new TransactionValidatorFactory(
+                                    gasCalculator,
+                                    gasLimitCalculator,
+                                    feeMarket,
+                                    true,
+                                    chainId,
+                                    Set.of(
+                                            TransactionType.FRONTIER,
+                                            TransactionType.ACCESS_LIST,
+                                            TransactionType.EIP1559,
+                                            TransactionType.BLOB),
+                                    SHANGHAI_INIT_CODE_SIZE_LIMIT))
+            .precompileContractRegistryBuilder(MainnetPrecompiledContractRegistries::prague)
+            .blockHeaderValidatorBuilder(MainnetBlockHeaderValidator::pragueBlockHeaderValidator)
+            .name("Prague");
   }
 
   static ProtocolSpecBuilder futureEipsDefinition(
