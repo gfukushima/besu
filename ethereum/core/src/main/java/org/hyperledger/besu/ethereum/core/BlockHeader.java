@@ -182,6 +182,10 @@ public class BlockHeader extends SealableBlockHeader
     if (depositsRoot != null) {
       out.writeBytes(depositsRoot);
     }
+    if (executionWitness != null) {
+      // TODO VERKLE FIX THIS
+      out.writeBytes(Bytes.EMPTY);
+    }
     out.endList();
   }
 

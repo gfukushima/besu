@@ -151,6 +151,7 @@ dependencies {
   implementation project(':util')
   implementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
   implementation project(':ethereum:rlp')
+  implementation project(':ethereum:trie')
   implementation project(':evm')
   implementation project(':services:kvstore')
 

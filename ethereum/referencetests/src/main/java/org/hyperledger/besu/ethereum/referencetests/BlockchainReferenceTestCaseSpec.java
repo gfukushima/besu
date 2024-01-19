@@ -37,6 +37,7 @@ import org.hyperledger.besu.ethereum.core.Withdrawal;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockHeaderFunctions;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPInput;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
+import org.hyperledger.besu.ethereum.trie.verkle.ExecutionWitness;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.evm.log.LogsBloomFilter;
 import org.hyperledger.besu.evm.worldstate.WorldUpdater;
@@ -165,6 +166,7 @@ public class BlockchainReferenceTestCaseSpec {
         @JsonProperty("nonce") final String nonce,
         @JsonProperty("withdrawalsRoot") final String withdrawalsRoot,
         @JsonProperty("depositsRoot") final String depositsRoot,
+        @JsonProperty("executionWitness") final String executionWitness,
         @JsonProperty("dataGasUsed")
             final String dataGasUsed, // TODO: remove once reference tests have been updated
         @JsonProperty("excessDataGas")
@@ -203,6 +205,9 @@ public class BlockchainReferenceTestCaseSpec {
               : excessBlobGas != null ? BlobGas.fromHexString(excessBlobGas) : null,
           parentBeaconBlockRoot != null ? Bytes32.fromHexString(parentBeaconBlockRoot) : null,
           depositsRoot != null ? Hash.fromHexString(depositsRoot) : null,
+          executionWitness != null
+              ? new ExecutionWitness(Bytes.fromHexString(executionWitness))
+              : null,
           new BlockHeaderFunctions() {
             @Override
             public Hash hash(final BlockHeader header) {
