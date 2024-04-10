@@ -15,6 +15,7 @@
 package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
+import static org.hyperledger.besu.ethereum.eth.messages.EthPV62.GET_BLOCK_HEADERS;
 import static org.hyperledger.besu.ethereum.eth.sync.fastsync.PivotBlockRetriever.MAX_QUERY_RETRIES_PER_PEER;
 import static org.hyperledger.besu.util.log.LogUtil.throttledLog;
 
@@ -23,6 +24,7 @@ import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeers;
+import org.hyperledger.besu.ethereum.eth.messages.EthPV62;
 import org.hyperledger.besu.ethereum.eth.sync.AbstractSyncTargetManager;
 import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
 import org.hyperledger.besu.ethereum.eth.sync.tasks.RetryingGetHeaderFromPeerByNumberTask;
@@ -30,10 +32,11 @@ import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorageCoordinator;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
+import org.hyperledger.besu.util.ExceptionUtils;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -112,19 +115,17 @@ public class SyncTargetManager extends AbstractSyncTargetManager {
             pivotBlockHeader.getNumber(),
             MAX_QUERY_RETRIES_PER_PEER);
     task.assignPeer(bestPeer);
-    return ethContext
-        .getScheduler()
-        .timeout(task)
+    return task.getHeader()
         .thenCompose(
-            result -> {
-              if (peerHasDifferentPivotBlock(result)) {
+            blockHeader -> {
+              if (peerHasDifferentPivotBlock(blockHeader)) {
                 if (!hasPivotChanged(pivotBlockHeader)) {
                   // if the pivot block has not changed, then warn and disconnect this peer
                   LOG.warn(
                       "Best peer has wrong pivot block (#{}) expecting {} but received {}.  Disconnect: {}",
                       pivotBlockHeader.getNumber(),
-                      pivotBlockHeader.getHash(),
-                      result.size() == 1 ? result.get(0).getHash() : "invalid response",
+                      pivotBlockHeader,
+                      blockHeader,
                       bestPeer);
                   bestPeer.disconnect(DisconnectReason.USELESS_PEER_MISMATCHED_PIVOT_BLOCK);
                   return CompletableFuture.completedFuture(Optional.<EthPeer>empty());
@@ -145,6 +146,12 @@ public class SyncTargetManager extends AbstractSyncTargetManager {
             })
         .exceptionally(
             error -> {
+              if (error != null) {
+                error = ExceptionUtils.rootCause(error);
+                if (error instanceof TimeoutException) {
+                  bestPeer.recordRequestTimeout(EthPV62.GET_BLOCK_HEADERS);
+                }
+              }
               LOG.debug("Could not confirm best peer had pivot block", error);
               return Optional.empty();
             });
@@ -157,9 +164,9 @@ public class SyncTargetManager extends AbstractSyncTargetManager {
         .isEmpty();
   }
 
-  private boolean peerHasDifferentPivotBlock(final List<BlockHeader> result) {
+  private boolean peerHasDifferentPivotBlock(final BlockHeader result) {
     final BlockHeader pivotBlockHeader = fastSyncState.getPivotBlockHeader().get();
-    return result.size() != 1 || !result.get(0).equals(pivotBlockHeader);
+    return !result.equals(pivotBlockHeader);
   }
 
   @Override
