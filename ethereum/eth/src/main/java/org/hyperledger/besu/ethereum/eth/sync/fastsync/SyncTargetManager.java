@@ -15,7 +15,6 @@
 package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.hyperledger.besu.ethereum.eth.sync.fastsync.PivotBlockRetriever.MAX_QUERY_RETRIES_PER_PEER;
 import static org.hyperledger.besu.util.log.LogUtil.throttledLog;
 
 import org.hyperledger.besu.ethereum.ProtocolContext;
@@ -26,7 +25,7 @@ import org.hyperledger.besu.ethereum.eth.manager.EthPeers;
 import org.hyperledger.besu.ethereum.eth.messages.EthPV62;
 import org.hyperledger.besu.ethereum.eth.sync.AbstractSyncTargetManager;
 import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
-import org.hyperledger.besu.ethereum.eth.sync.tasks.RetryingGetHeaderFromPeerByNumberTask;
+import org.hyperledger.besu.ethereum.eth.sync.tasks.RetryingGetHeaderFromPeerByHashTask;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorageCoordinator;
@@ -106,13 +105,9 @@ public class SyncTargetManager extends AbstractSyncTargetManager {
 
   private CompletableFuture<Optional<EthPeer>> confirmPivotBlockHeader(final EthPeer bestPeer) {
     final BlockHeader pivotBlockHeader = fastSyncState.getPivotBlockHeader().get();
-    final RetryingGetHeaderFromPeerByNumberTask task =
-        RetryingGetHeaderFromPeerByNumberTask.forSingleNumber(
-            protocolSchedule,
-            ethContext,
-            metricsSystem,
-            pivotBlockHeader.getNumber(),
-            MAX_QUERY_RETRIES_PER_PEER);
+    final RetryingGetHeaderFromPeerByHashTask task =
+        RetryingGetHeaderFromPeerByHashTask.byHash(
+            protocolSchedule, ethContext, pivotBlockHeader.getHash(), 0, metricsSystem);
     task.assignPeer(bestPeer);
     return task.getHeader()
         .thenCompose(
