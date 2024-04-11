@@ -330,6 +330,10 @@ public class EthPeers {
         p -> p.isFullyValidated() && p.chainState().hasEstimatedHeight());
   }
 
+  public Optional<EthPeer> bestPeerWithReputationScore() {
+    return streamAvailablePeers().filter(EthPeer::isFullyValidated).min(MOST_USEFUL_PEER);
+  }
+
   public Optional<EthPeer> bestPeerMatchingCriteria(final Predicate<EthPeer> matchesCriteria) {
     return streamAvailablePeers().filter(matchesCriteria).max(getBestChainComparator());
   }

@@ -15,7 +15,6 @@
 package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.hyperledger.besu.ethereum.eth.messages.EthPV62.GET_BLOCK_HEADERS;
 import static org.hyperledger.besu.ethereum.eth.sync.fastsync.PivotBlockRetriever.MAX_QUERY_RETRIES_PER_PEER;
 import static org.hyperledger.besu.util.log.LogUtil.throttledLog;
 
@@ -77,7 +76,7 @@ public class SyncTargetManager extends AbstractSyncTargetManager {
   protected CompletableFuture<Optional<EthPeer>> selectBestAvailableSyncTarget() {
     final BlockHeader pivotBlockHeader = fastSyncState.getPivotBlockHeader().get();
     final EthPeers ethPeers = ethContext.getEthPeers();
-    final Optional<EthPeer> maybeBestPeer = ethPeers.bestPeerWithHeightEstimate();
+    final Optional<EthPeer> maybeBestPeer = ethPeers.bestPeerWithReputationScore();
     if (maybeBestPeer.isEmpty()) {
       throttledLog(
           LOG::debug,
